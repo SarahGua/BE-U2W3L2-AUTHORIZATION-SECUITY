@@ -6,7 +6,6 @@ import org.springframework.stereotype.Component;
 import sarahguarneri.BEU2W3L2.entities.User;
 import io.jsonwebtoken.Jwts;
 
-import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 @Component
@@ -24,5 +23,18 @@ public class JWTTools {
                 .compact();
     }
 
-    public void verifyToken(){};
+    public void verifyToken(String accessToken){
+        try{
+            Jwts.parser().verifyWith(Keys.hmacShaKeyFor(secret.getBytes())).build().parse(accessToken);
+        } catch (Exception e) {
+            throw new RuntimeException("Problemi con ilò token, effettuare di nuovo il login");
+        }
+    }
+
+    public String extractIdFromToken(String token){
+        return Jwts.parser()
+                .verifyWith(Keys.hmacShaKeyFor(secret.getBytes()))
+                .build()
+                .parseSignedClaims(token).getPayload().getSubject();
+    }
 }
